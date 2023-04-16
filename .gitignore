@@ -1,0 +1,9 @@
+.DS_Store
+/lambda/bin
+/lambda/c*
+/lambda/i*
+/lambda/r*
+/lambda/u*
+/terraform/.*
+/terraform/terraform.tf*
+/terraform/*.zip
