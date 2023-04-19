@@ -7,8 +7,8 @@ export AWS_SECRET_ACCESS_KEY=
 
 terraform init
 
-pip install requests -t ./
-
 # applying changes
 terraform plan
 terraform apply
+
+pip install requests -t ./
