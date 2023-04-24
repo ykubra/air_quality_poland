@@ -6,4 +6,5 @@
 /lambda/u*
 /terraform/.*
 /terraform/terraform.tf*
-/terraform/*.zip
+/**/*.zip
+/test-lambda/package

@@ -12,3 +12,8 @@ terraform plan
 terraform apply
 
 pip install requests -t ./
+
+# Removing resources
+terraform destroy
+
+cd ../test-lambda/package && zip -r ../lambda_function3.zip . && cd .. && zip lambda_function3.zip test-lambda-func.py && cd ../terraform 
