@@ -11,7 +11,7 @@ resource "aws_db_subnet_group" "my-subnet-group" {
 
 # create rds mysql db
 resource "aws_db_instance" "myrds" {
- 
+  db_name              = "airqualitydatabase"
   engine               = "mysql"
   engine_version       = "8.0.32"
   allocated_storage    = 20
@@ -22,6 +22,8 @@ resource "aws_db_instance" "myrds" {
   password             = "passw0rd!123"
   skip_final_snapshot  = true
   db_subnet_group_name = aws_db_subnet_group.my-subnet-group.name
+  vpc_security_group_ids = [aws_security_group.sg_rds.id]
+
   tags = {
         Name ="Myrdsdb"
   }

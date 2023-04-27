@@ -1,10 +1,11 @@
 .DS_Store
-/lambda/bin
-/lambda/c*
-/lambda/i*
-/lambda/r*
-/lambda/u*
+/**/bin
+/**/c*
+/**/i*
+/**/r*
+/**/u*
 /terraform/.*
 /terraform/terraform.tf*
 /**/*.zip
 /test-lambda/package
+/**/pymysql*

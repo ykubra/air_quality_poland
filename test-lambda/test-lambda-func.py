@@ -2,12 +2,13 @@ import sys
 import logging
 import pymysql
 import json
+import requests
 
 # rds settings
-rds_host  = "mydb.c90zzxhsmdkg.us-west-2.rds.amazonaws.com"
+rds_host  = "terraform-proxy-db.proxy-cmdledmxfjrp.us-west-2.rds.amazonaws.com"
 user_name = "admin"
 password = "passw0rd!123"
-db_name = "mydb"
+db_name = "airqualitydatabase"
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -52,5 +53,10 @@ def lambda_handler(event, context):
             item_count += 1
             logger.info(row)
     connection.commit()
+
+    api_url = "https://jsonplaceholder.typicode.com/todos"
+    logger.info("Making API call")
+    response = requests.get(api_url)
+    logger.info(response.json())
 
     return "Added %d items to RDS MySQL table" %(item_count)

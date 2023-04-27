@@ -18,14 +18,14 @@ resource "aws_db_proxy" "db_proxy" {
   debug_logging          = false
   engine_family          = "MYSQL"
   idle_client_timeout    = 1800
-  require_tls            = true
+  require_tls            = false
   role_arn               = aws_iam_role.rds_proxy_iam_role.arn
   vpc_security_group_ids = [aws_security_group.sg_rds_proxy.id]
   vpc_subnet_ids         = [aws_subnet.PrivateSubnet.id ,aws_subnet.PublicSubnet.id]
 
   auth {
     auth_scheme = "SECRETS"
-    iam_auth    = "REQUIRED"
+    iam_auth    = "DISABLED"
     secret_arn  = aws_secretsmanager_secret.rds_secret.arn
   }
 }
