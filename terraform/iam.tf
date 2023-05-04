@@ -89,3 +89,4 @@ resource "aws_iam_role_policy_attachment" "apigateway_invoke_access_policy" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
 }
+

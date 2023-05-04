@@ -8,74 +8,82 @@ resource "aws_api_gateway_rest_api" "api_gateway" {
 
 #create resource
 
-resource "aws_api_gateway_resource" "database_resource" {
+resource "aws_api_gateway_resource" "data_load_resource" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
   parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id # In this case, the parent id should the gateway root_resource_id.
-  path_part   = "database"
+  path_part   = "data_load"
+}
+resource "aws_api_gateway_resource" "get_all_data_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id # In this case, the parent id should the gateway root_resource_id.
+  path_part   = "get_all_data"
 }
 
-#create method
+#create method for data load
+
+resource "aws_api_gateway_method" "data_load_method" {
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
+  resource_id   = aws_api_gateway_resource.data_load_resource.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+#create method to get all data 
 
 resource "aws_api_gateway_method" "get_all_data_method" {
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
-  resource_id   = aws_api_gateway_resource.database_resource.id
+  resource_id   = aws_api_gateway_resource.get_all_data_resource.id
   http_method   = "GET"
   authorization = "NONE"
 }
 
 #integrate endpoints
 
-resource "aws_api_gateway_integration" "integration" {
+resource "aws_api_gateway_integration" "data_load_method_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
-  resource_id             = aws_api_gateway_resource.database_resource.id
+  resource_id             = aws_api_gateway_resource.data_load_resource.id
+  http_method             = aws_api_gateway_method.data_load_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambda_data_load.invoke_arn
+}
+
+resource "aws_api_gateway_integration" "get_all_data_method_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
+  resource_id             = aws_api_gateway_resource.get_all_data_resource.id
   http_method             = aws_api_gateway_method.get_all_data_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambda.invoke_arn
+  uri                     = aws_lambda_function.lambda_get_all_data.invoke_arn
 }
-/*
-resource "aws_api_gateway_method_response" "response_200" {
-  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  resource_id = aws_api_gateway_resource.database_resource.id
-  http_method = aws_api_gateway_method.get_all_data_method.http_method
-  status_code = "200"
-}
-
-resource "aws_api_gateway_integration_response" "MyDemoIntegrationResponse" {
-  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  resource_id = aws_api_gateway_resource.database_resource.id
-  http_method = aws_api_gateway_method.get_all_data_method.http_method
-  status_code = aws_api_gateway_method_response.response_200.status_code
-
-  # Transforms the backend JSON response to XML
-  response_templates = {
-    "application/xml" = <<EOF
-#set($inputRoot = $input.path('$'))
-<?xml version="1.0" encoding="UTF-8"?>
-<message>
-    $inputRoot.body
-</message>
-EOF
-  }
-}*/
-
 resource "aws_api_gateway_deployment" "api_deployement" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-
+  # whenever provided resources change that trigers deployement 
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.database_resource.id,
+      aws_api_gateway_resource.data_load_resource.id,
+      aws_api_gateway_resource.get_all_data_resource.id,
+      aws_api_gateway_method.data_load_method.id,
       aws_api_gateway_method.get_all_data_method.id,
-      aws_api_gateway_integration.integration.id,
+      aws_api_gateway_integration.data_load_method_integration.id,
+      aws_api_gateway_integration.get_all_data_method_integration.id
     ]))
   }
+
+  depends_on = [
+    aws_api_gateway_resource.data_load_resource,
+    aws_api_gateway_resource.get_all_data_resource,
+    aws_api_gateway_method.data_load_method,
+    aws_api_gateway_method.get_all_data_method,
+    aws_api_gateway_integration.data_load_method_integration,
+    aws_api_gateway_integration.get_all_data_method_integration
+  ]
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_api_gateway_stage" "example" {
+resource "aws_api_gateway_stage" "api_gateway_stage_production" {
   deployment_id = aws_api_gateway_deployment.api_deployement.id
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
   stage_name    = "production"

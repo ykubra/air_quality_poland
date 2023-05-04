@@ -11,7 +11,9 @@ terraform init
 terraform plan
 terraform apply
 
-pip install requests -t ./
+pip install ordereddict -t ./
+pip install -r requirements.txt -t ./
+rm -rf *dist-info
 
 # Removing resources
 terraform destroy
