@@ -1,46 +1,18 @@
 import sys
 import logging
 import pymysql
-import json
 import requests
 from pyjstat import pyjstat
-import pandas as pd
-
 from collections import OrderedDict
-import boto3
-from botocore.exceptions import ClientError
+
+rds_host="terraform-proxy-db.proxy-cq9xirobakjy.us-west-2.rds.amazonaws.com"
+port=int(3306)
+user_name = "admin"
+password = "passw0rd!123"
+db_name = "airqualitydatabase"
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-secret_name = "rds-proxy-secret"
-region_name = "us-west-2"
-
-# Create a Secrets Manager client
-session = boto3.session.Session()
-client = session.client(
-    service_name='secretsmanager',
-    region_name=region_name
-)
-logger.info('Secrets Manager Client created succesfully')
-try:
-    get_secret_value_response = client.get_secret_value(
-        SecretId=secret_name
-    )
-except ClientError as e:
-    logger.info("Couldn't get secret_value_response")
-    raise e
-
-# Decrypts secret using the associated KMS key.
-secret = json.loads(get_secret_value_response['SecretString'])
-logger.info(secret)
-
-rds_host=secret["host"]
-port=secret["port"]
-user_name = secret["username"]
-password = secret["password"]
-db_name = secret["db_name"]
-
 
 # create the database connection outside of the handler to allow connections to be
 # re-used by subsequent function invocations.

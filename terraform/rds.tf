@@ -18,9 +18,10 @@ resource "aws_db_instance" "myrds" {
   storage_type         = "gp2"
   identifier           = "mydb"
   instance_class       = "db.t3.micro"
-  username             = "admin"
-  password             = "passw0rd!123"
   skip_final_snapshot  = true
+  username             = "admin"
+  password             = random_password.rds_password.result
+
   db_subnet_group_name = aws_db_subnet_group.my-subnet-group.name
   vpc_security_group_ids = [aws_security_group.sg_rds.id]
 

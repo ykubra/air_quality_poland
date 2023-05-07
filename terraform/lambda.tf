@@ -1,19 +1,21 @@
 
 # create an archive to zip necessary libraries 
-data "archive_file" "lambda_dependencies_archive" {
+/*data "archive_file" "lambda_dependencies_archive" {
   type        = "zip"
   # Unzipped files have follow this structure:
-  # python/lib/python3.9/site-packages/{libraries}
+  # python/lib/python3.9/site-packages/{libraries} or
+  # python/{libraries}
   source_dir = "../lambda/packages"
   output_path = "lambda_dependencies_archive.zip"
-}
+}*/
+
 resource "aws_lambda_layer_version" "lambda_dependencies_layer" {
-  filename   = "lambda_dependencies_archive.zip"
+  filename   = "lambda_dependencies_docker_2.zip"
   layer_name = "lambda_dependencies_layer"
   compatible_runtimes = ["python3.9"]
   compatible_architectures = ["x86_64"]
 
-  source_code_hash = data.archive_file.lambda_dependencies_archive.output_base64sha256
+  #source_code_hash = data.archive_file.lambda_dependencies_docker.output_base64sha256
 }
 
 # Archive for lambda_data_load
