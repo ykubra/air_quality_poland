@@ -109,7 +109,10 @@ def lambda_handler(event, context):
          # Commit the changes
         connection.commit()
         
-        return {
-                'statusCode': 200,
-                'body': 'Data inserted successfully'
-            }
+        responseObject = {}
+        responseObject['statusCode'] = 200
+        responseObject['headers'] = {}
+        responseObject['headers']['Content-Type'] = 'application/json'
+        responseObject['body'] = json.dumps('Data inserted successfully')
+
+        return responseObject
