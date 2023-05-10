@@ -27,11 +27,11 @@ resource "aws_subnet" "PrivateSubnet" {
   }
 }
 
-# create an internet gateway
+# Create an internet gateway
 resource "aws_internet_gateway" "igw"{
   vpc_id = aws_vpc.myvpc.id
 }
-# create route tables
+# Create route tables
 resource "aws_route_table" "PublicRT"{
   vpc_id = aws_vpc.myvpc.id
   route {
@@ -51,12 +51,12 @@ resource "aws_route_table" "PrivateRT"{
 
 
 
-# route table association public subnet
+# Route table association public subnet
 resource "aws_route_table_association" "PublicRTassociation"{
   subnet_id = aws_subnet.PublicSubnet.id
   route_table_id = aws_route_table.PublicRT.id
 }
-# route table association private subnet
+# Route table association private subnet
 resource "aws_route_table_association" "PrivateRTassociation"{
   subnet_id = aws_subnet.PrivateSubnet.id
   route_table_id = aws_route_table.PrivateRT.id

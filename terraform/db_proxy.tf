@@ -1,3 +1,4 @@
+# Create default target group
 resource "aws_db_proxy_default_target_group" "rds_proxy_target_group" {
   db_proxy_name = aws_db_proxy.db_proxy.name
 
@@ -7,12 +8,14 @@ resource "aws_db_proxy_default_target_group" "rds_proxy_target_group" {
   }
 }
 
+# Create proxy target
 resource "aws_db_proxy_target" "rds_proxy_target" {
-  db_instance_identifier = aws_db_instance.myrds.id
+  db_instance_identifier = aws_db_instance.energy_consumption_db.id
   db_proxy_name          = aws_db_proxy.db_proxy.name
   target_group_name      = aws_db_proxy_default_target_group.rds_proxy_target_group.name
 }
 
+# Create RDS proxy
 resource "aws_db_proxy" "db_proxy" {
   name                 = "terraform-proxy-db"
   debug_logging          = false

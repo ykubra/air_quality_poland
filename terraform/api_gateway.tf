@@ -1,3 +1,4 @@
+# Create API gateway
 resource "aws_api_gateway_rest_api" "api_gateway" {
   name = "energy_consumption_api"
 
@@ -6,29 +7,25 @@ resource "aws_api_gateway_rest_api" "api_gateway" {
   }
 }
 
-#create resource
-
+# Create API gateway resources for Lambda functions
 resource "aws_api_gateway_resource" "data_load_resource" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id # In this case, the parent id should the gateway root_resource_id.
+  parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id 
   path_part   = "data_load"
 }
 resource "aws_api_gateway_resource" "get_all_data_resource" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id # In this case, the parent id should the gateway root_resource_id.
+  parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id
   path_part   = "get_all_data"
 }
 
-#create method for data load
-
+# Create methods for Lambda functions
 resource "aws_api_gateway_method" "data_load_method" {
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
   resource_id   = aws_api_gateway_resource.data_load_resource.id
   http_method   = "POST"
   authorization = "NONE"
 }
-#create method to get all data 
-
 resource "aws_api_gateway_method" "get_all_data_method" {
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
   resource_id   = aws_api_gateway_resource.get_all_data_resource.id
@@ -36,8 +33,7 @@ resource "aws_api_gateway_method" "get_all_data_method" {
   authorization = "NONE"
 }
 
-#integrate endpoints
-
+# Integrate endpoints
 resource "aws_api_gateway_integration" "data_load_method_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
   resource_id             = aws_api_gateway_resource.data_load_resource.id
@@ -46,7 +42,6 @@ resource "aws_api_gateway_integration" "data_load_method_integration" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_data_load.invoke_arn
 }
-
 resource "aws_api_gateway_integration" "get_all_data_method_integration" {
   rest_api_id             = aws_api_gateway_rest_api.api_gateway.id
   resource_id             = aws_api_gateway_resource.get_all_data_resource.id
@@ -55,9 +50,11 @@ resource "aws_api_gateway_integration" "get_all_data_method_integration" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda_get_all_data.invoke_arn
 }
+
+# Deploy API gateway
 resource "aws_api_gateway_deployment" "api_deployement" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
-  # whenever provided resources change that trigers deployement 
+  # Whenever provided resources change that trigers deployement 
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.data_load_resource.id,
@@ -83,6 +80,7 @@ resource "aws_api_gateway_deployment" "api_deployement" {
   }
 }
 
+# Create API gateway stage
 resource "aws_api_gateway_stage" "api_gateway_stage_production" {
   deployment_id = aws_api_gateway_deployment.api_deployement.id
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id

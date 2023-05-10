@@ -1,3 +1,4 @@
+# Create security groups
 resource "aws_security_group" "sg_lambda" {
   vpc_id      = aws_vpc.myvpc.id
 
