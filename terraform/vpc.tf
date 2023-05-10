@@ -31,7 +31,7 @@ resource "aws_subnet" "PrivateSubnet" {
 resource "aws_internet_gateway" "igw"{
   vpc_id = aws_vpc.myvpc.id
 }
-# create route table
+# create route tables
 resource "aws_route_table" "PublicRT"{
   vpc_id = aws_vpc.myvpc.id
   route {
@@ -61,11 +61,13 @@ resource "aws_route_table_association" "PrivateRTassociation"{
   subnet_id = aws_subnet.PrivateSubnet.id
   route_table_id = aws_route_table.PrivateRT.id
 }
-resource "aws_eip" "eip" {
-  
+
+# Create Elastic IP address
+resource "aws_eip" "eip" {  
   vpc      = true
 }
 
+# Create nat gateway
 resource "aws_nat_gateway" "nat_gateway" {
   allocation_id = aws_eip.eip.id
   connectivity_type = "public"

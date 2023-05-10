@@ -75,13 +75,17 @@ def lambda_handler(event, context):
             values = ', '.join(['%s'] * len(row))
         '''
         # creating column list for insertion
-        cols = ",".join([str(i) for i in nrg_con_total.columns.tolist()])
+        #cols = "`" + "`,`".join([str(i) for i in nrg_con_total.columns.tolist()]) + "`"
+        cols = "`" + nrg_con_total.index.name + "`, `" + "`,`".join([str(i) for i in nrg_con_total.columns.tolist()]) + "`"
+
 
 
 
         with connection.cursor() as cursor:
             # Generate the CREATE TABLE statement based on DataFrame columns
-            create_table_query = f"CREATE TABLE IF NOT EXISTS energy_consumption ({nrg_con_total.index.name} varchar(255), `{'` FLOAT, `'.join(nrg_con_total.columns)}` FLOAT);"
+            #create_table_query = f"CREATE TABLE IF NOT EXISTS energy_consumption ({nrg_con_total.index.name} varchar(255), `{'` FLOAT, `'.join(nrg_con_total.columns)}` FLOAT);"
+            create_table_query = f"CREATE TABLE IF NOT EXISTS energy_consumption ({nrg_con_total.index.name} varchar(255) PRIMARY KEY, `{'` FLOAT, `'.join(nrg_con_total.columns)}` FLOAT);"
+
             logger.info("Create table if it doesn't exist")
             logger.info(create_table_query)
             cursor.execute(create_table_query)
@@ -91,13 +95,29 @@ def lambda_handler(event, context):
             #insert_query = f"INSERT INTO energy_consumption ({columns}) VALUES ({values})"
             # Insert DataFrame records one by one
             for i, row in nrg_con_total.iterrows():
-                # Build the SQL INSERT statement
-                insert_query = "INSERT INTO movies_details (" + cols + ") VALUES (" + "%s," * (len(row) - 1) + "%s)"
-                cursor.execute(insert_query, tuple(row()))
+                values = tuple([i] + row.tolist())
+                placeholders = ",".join(["%s"] * len(values))
+
+                # build the INSERT statement with placeholders
+                #sql = f"INSERT INTO `energy_consumption_1` ({cols}) VALUES ({placeholders})"
+                sql = f"INSERT IGNORE INTO `energy_consumption` ({cols}) VALUES ({placeholders})"
+
+                # execute the query
+                cursor.execute(sql, values)
+
+
+            cursor.execute("SELECT * FROM energy_consumption")
+
+            # fetch all rows from the result set
+            rows = cursor.fetchall()
+            
+            # print the rows
+            #for row in rows:
+            print(rows[0])
 
          # Commit the changes
         connection.commit()
-    
+        
         return {
                 'statusCode': 200,
                 'body': 'Data inserted successfully'
