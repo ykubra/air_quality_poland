@@ -1,7 +1,7 @@
 # Create subnet group for RDS
 resource "aws_db_subnet_group" "rds_subnet_group" {
- name       = "rds_subnet_group"
-  subnet_ids = [aws_subnet.PublicSubnet.id, aws_subnet.PrivateSubnet.id]
+  name       = "rds_subnet_group"
+  subnet_ids = [aws_subnet.PrivateSubnet1.id, aws_subnet.PrivateSubnet2.id]
   
   tags = {
    Name = "terraform_rds_subnet_group"

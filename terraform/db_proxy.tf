@@ -24,7 +24,7 @@ resource "aws_db_proxy" "db_proxy" {
   require_tls            = false
   role_arn               = aws_iam_role.rds_proxy_iam_role.arn
   vpc_security_group_ids = [aws_security_group.sg_rds_proxy.id]
-  vpc_subnet_ids         = [aws_subnet.PrivateSubnet.id ,aws_subnet.PublicSubnet.id]
+  vpc_subnet_ids         = [aws_subnet.PrivateSubnet1.id, aws_subnet.PrivateSubnet2.id]
 
   auth {
     auth_scheme = "SECRETS"

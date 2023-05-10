@@ -10,7 +10,7 @@
 
 # Create dependencies layer for Lambda which is used by Lambda's functions 
 resource "aws_lambda_layer_version" "lambda_dependencies_layer" {
-  filename   = "lambda_dependencies_docker_2.zip"
+  filename   = "lambda_dependencies_docker.zip"
   layer_name = "lambda_dependencies_layer"
   compatible_runtimes = ["python3.9"]
   compatible_architectures = ["x86_64"]
@@ -29,12 +29,13 @@ resource "aws_lambda_function" "lambda_data_load" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "data_load_operation.lambda_handler"
   layers        = [aws_lambda_layer_version.lambda_dependencies_layer.id]
+  timeout       = 15
 
   source_code_hash = data.archive_file.lambda_data_load_archive.output_base64sha256
 
   runtime = "python3.9"
   vpc_config {
-    subnet_ids         = [aws_subnet.PrivateSubnet.id]
+    subnet_ids         = [aws_subnet.PrivateSubnet1.id]
     security_group_ids = [aws_security_group.sg_lambda.id]
   }
 
@@ -53,12 +54,13 @@ resource "aws_lambda_function" "lambda_get_all_data" {
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "get_all_data_operation.lambda_handler"
   layers        = [aws_lambda_layer_version.lambda_dependencies_layer.id]
+  timeout       = 10
 
   source_code_hash = data.archive_file.lambda_get_all_data_archive.output_base64sha256
 
   runtime = "python3.9"
   vpc_config {
-    subnet_ids         = [aws_subnet.PrivateSubnet.id]
+    subnet_ids         = [aws_subnet.PrivateSubnet1.id]
     security_group_ids = [aws_security_group.sg_lambda.id]
   }
 
