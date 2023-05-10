@@ -5,20 +5,24 @@ import logging
 from botocore.exceptions import ClientError
 import boto3
 
-
+# Set up a logger to handle INFO-level log messages
 logger = logging.getLogger()
 logger.setLevel(logging.INFO) 
 
+# Specify the name of the secret and the region where the secret is stored
 secret_name = "rds-proxy-secret"
 region_name = "us-west-2"
 
-# Create a Secrets Manager client
+# Create a Secrets Manager client using the AWS SDK
 session = boto3.session.Session()
 client = session.client(
     service_name='secretsmanager',
     region_name=region_name
 )
+
 logger.info('Secrets Manager Client created succesfully')
+
+# Retrieve the secret value from AWS Secrets Manager 
 try:
     get_secret_value_response = client.get_secret_value(
         SecretId=secret_name
@@ -27,10 +31,13 @@ except ClientError as e:
     logger.info("Couldn't get secret_value_response")
     raise e
 
-# Decrypts secret using the associated KMS key.
+# Read the secret value from AWS Secrets Manager and load it into a Python dictionary
 secret = json.loads(get_secret_value_response['SecretString'])
+
+# Log the secret value to the console
 logger.info(secret)
 
+# Extract the connection details from the dictionary
 rds_host=secret["host"]
 port=secret["port"]
 user_name = secret["username"]
@@ -38,8 +45,7 @@ password = secret["password"]
 db_name = secret["db_name"]
 
 
-# create the database connection outside of the handler to allow connections to be
-# re-used by subsequent function invocations.
+# Try to establish a connection to the MySQL database using the provided credentials 
 try:
     connection = pymysql.connect(host=rds_host, user=user_name, passwd=password, db=db_name, connect_timeout=5)
 except pymysql.MySQLError as e:
@@ -49,20 +55,23 @@ except pymysql.MySQLError as e:
 
 logger.info("SUCCESS: Connection to RDS MySQL instance succeeded")
 
-def lambda_handler(event, context):
-	logger.info("print the table")
-    
+def lambda_handler(event, context):    
+	logger.info("Print the table")
+        
+    # Establish a connection to the MySQL database and create a cursor object
 	with connection.cursor() as cursor:  
+                
+        # Select all rows and columns from the "energy_consumption" table
 		cursor.execute("SELECT * FROM energy_consumption")
 
-			# fetch all rows from the result set
+		# Fetch all the rows returned by the query 
 		rows = cursor.fetchall()
 			
-			# print the rows
+		# Print the rows
 		for row in rows:
 			print(row)
 
-		# Commit the changes
+	# Commit the changes
 	connection.commit()
         
 	# Construct the body of the response object
@@ -81,6 +90,3 @@ def lambda_handler(event, context):
 			
 
 
-# 1. connect to rds
-# 2. get table from rds
-# 3. return it
