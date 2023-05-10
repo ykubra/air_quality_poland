@@ -4,6 +4,6 @@
 /terraform/terraform.tf*
 /terraform/*.tfstate
 /**/*.zip
-test-lambda-api-gateway/test-api-gateway.ipynb
+/test-lambda-api-gateway
 main.ipynb
 
