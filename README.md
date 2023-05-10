@@ -15,10 +15,7 @@ Also, you will need the following:
 - Docker installed on your local machine
 
 # Getting Started 
-1. Docker Instructions
-
-This process will generate a zip file containing the required dependencies that can be used in the AWS Lambda function.
-
+1. Docker Instructions: This process will generate a zip file containing the required dependencies that can be used in the AWS Lambda function.
     - Step 1 : In the terminal, run the `docker build -t <your image name> .` command to build the Docker image with the specified name.
 
     - Step 2 : After building the image, run `docker images` command to see the list of Docker images available.
