@@ -1,5 +1,5 @@
-# Project Name
-Energy Consumption in Europe
+# Energy Consumption in Europe
+
 ![AWS Infrasturcture Diagram](aws_project_infrastucture.png)
 
 The goal of this project is to create your own API which has two main functions; data_load which connects with external API(eurostat.com), cleans the data and inserts it to a RDS table, the second function get_all_data selects all data from RDS table and returns to the requestor. Secrets manager is used to store RDS credentials.
