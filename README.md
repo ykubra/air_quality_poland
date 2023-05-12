@@ -1,5 +1,8 @@
 # Project Name
 Energy Consumption in Europe
+![AWS Infrasturcture Diagram](aws_project_infrastucture.png)
+
+The goal of this project is to create your own API which has two main functions; data_load which connects with external API(eurostat.com), cleans the data and inserts it to a RDS table, the second function get_all_data selects all data from RDS table and returns to the requestor. Secrets manager is used to store RDS credentials.
 
 # Prerequisites
 
@@ -30,8 +33,8 @@ Also, you will need the following:
 2. Terraform Instructions: This process will deploy entire infrastructure to AWS.
     - Step 1: You need to configure your AWS credentials so that Terraform can access your account
         ```
-        export aws_access_key_id = YOUR_ACCESS_KEY_ID
-        export aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+        export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY_ID
+        export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_ACCESS_KEY
         ```
 
     - Step 2: Navigate to the terraform directory
